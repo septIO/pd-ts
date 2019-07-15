@@ -21,7 +21,7 @@ export class EntityTypeResolver {
         /**
          * Models has a capital first letter
          */
-        [Model, /^[A-Z][\w]*/, new Model("",[])],
+        [Model, /^[A-Z][\w]*/, new Model],
 
         /**
          * Tables has a lowercase first letter
