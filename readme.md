@@ -1,23 +1,23 @@
 [![CircleCI](https://circleci.com/gh/septIO/pd-ts/tree/dev.svg?style=svg)](https://circleci.com/gh/septIO/pd-ts/tree/dev)
 [![Coverage Status](https://coveralls.io/repos/github/septIO/pd-ts/badge.svg?branch=dev)](https://coveralls.io/github/septIO/pd-ts?branch=dev)
 
-#Install
-##Yarn
+# Install
+#### Yarn
 `$ yarn`
 
-##NPM
+#### NPM
 `$ npm intall`
 
-#Test
-##Yarn
+# Test
+#### Yarn
 `$ yarn test`
 
-##NPM
+#### NPM
 `$ npm run test`
 
-#Test with coverage
-##Yarn
+# Test with coverage
+#### Yarn
 `$ yarn coverage`
 
-##NPM
+#### NPM
 `$ npm run coverage`
