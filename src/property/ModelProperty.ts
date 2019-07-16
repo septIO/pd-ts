@@ -1,35 +1,24 @@
 import {Property} from "./Property";
 import {Utilities} from "../utilities/Utilities";
 import {__GITHUB_DUMP__} from '../github-dump'
+import {PropertyPrototype} from "./PropertyProto";
+import {AmbiguityException} from "../exceptions/AmbiguityException";
 
-export class ModelProperty extends Property {
+export class ModelProperty implements PropertyPrototype {
+    index: boolean = false;
+    primary?: boolean | undefined;
+    unique: boolean = false;
+    uniqueGroup?: [];
+    nullable: boolean = false;
+    precision?: number | undefined;
     datatype?: string;
     length?: number;
     defaultValue?: Primitive;
     name?: string;
 
-    constructor(name?: string, value?: any, options?: Primitive[]) {
-        super(name, value, options)
-        /**
-         * The name of the property
-         * @type string
-         */
-        this.name = name
 
-        /**
-         * The value of the property, this is typically the datatype (varchar, int, float etc)
-         * @type any
-         */
-        this.value = value
-
-        /**
-         * The options that affects this property. These are casted to different types, and means
-         * different things depending on what this.value is.
-         * @type Primitive[]
-         */
-        this.options = options
-
-        this.guessParameters()
+    constructor() {
+        //
     }
 
     /**
@@ -38,24 +27,46 @@ export class ModelProperty extends Property {
      * @return Property
      */
     static deserialize(string: string): ModelProperty {
-        let array = Utilities.splitAndClean(string, '>')
+        let array = Utilities.splitAndClean(string, /[^\w,]/)
         let name = array[0]
         if (!name)
             throw new ModelPropertyException(`Something is wrong with the property ${string}`)
 
-        const prop = new this(name)
+        const prop: ModelProperty = new ModelProperty()
+        prop.name = name
 
-        if (!array[1])
-            return prop
+        let propArguments = Utilities.splitAndClean(array.slice(1).join(" "), ',')
 
-        let valueArray = Utilities.splitAndClean(array[1], ':')
+        // These should be set to true if they're present
+        let trueIfSet = ["index", "primary", "nullable"]
+        const overwrites: ModelProperty = new ModelProperty();
 
-        prop.value = valueArray[0] || null
-        prop.options = [...valueArray.splice(1)] || null
+        propArguments.forEach(argument => {
+            const args = argument.match(/([\w]+)\W*(\w+)?/)!
+            if (!args && args[1])
+                return;
+            let attribute = <string>args[1]
+            console.log(args[2])
+
+            /**
+             * Automatically sets "true if present" on attributes
+             */
+            if (trueIfSet.includes(attribute)) {
+                if(Utilities.isAmbiguous(args[2]||"", '(true|false)'))
+                    throw AmbiguityException
+                //@ts-ignore
+                overwrites[attribute] = args[2] || true
+            }
+        })
+
+        console.log("isAmbiguous: ", Utilities.isAmbiguous("5 55", /(\d+)/g))
+        console.log(overwrites)
+        console.log(propArguments)
+
         return prop
     }
 
-    guessParameters() {
+    static guessDataType() {
         let datatype: string = "";
         for (const [regex, type] of this.typePatterns.entries()) {
             if (regex.test(<string>this.name))
@@ -70,10 +81,10 @@ export class ModelProperty extends Property {
         datatype = this.aliases[datatype]
 
         // Datatype wasn't found, maybe the user wrote something else
-        if (!datatype) {
+        /*if (!datatype) {
             if (this.value === "foreign")
                 this.setupRelation()
-        }
+        }*/
         return datatype
     }
 
@@ -83,7 +94,7 @@ export class ModelProperty extends Property {
     /**
      * key => value pairs for datatypes / abbreviations to standard types
      */
-    private aliases: { [s: string]: string } = {
+    private static aliases: { [s: string]: string } = {
         // Strings
         "varchar": "string",
         "string": "string",
@@ -130,7 +141,7 @@ export class ModelProperty extends Property {
         "bit": "bit"
     }
 
-    private typePatterns: Map<RegExp, string> = new Map<RegExp, string>([
+    private static typePatterns: Map<RegExp, string> = new Map<RegExp, string>([
         // foreign keys are typically uint32, and ends in _id
         [/_id$/, "uint32"],
 

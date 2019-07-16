@@ -36,7 +36,7 @@ export class EntityTypeResolver {
 
 
     /**
-     * Tries to resolve an Entity's datatype
+     * Tries to resolveArguments an Entity's datatype
      * Returns a {NotImplementedEntityType} if the entity couldn't be resolved
      * @param data {string}
      * @return {Entity}

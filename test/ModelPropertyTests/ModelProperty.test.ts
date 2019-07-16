@@ -1,6 +1,7 @@
 import {ModelProperty} from "../../src/property/ModelProperty";
 
 describe("Property", () => {
+    /*
     describe("ModelProperty", () => {
         describe("ModelProperty parameter predictor", () => {
             it("Can predict 'created_at' to be of type 'timestamp'", () => {
@@ -18,5 +19,8 @@ describe("Property", () => {
                 expect(new ModelProperty('created_at', 'string'))
             })
         })
+    })*/
+    test("tester", () => {
+        ModelProperty.deserialize("model string 50, index : true : false : etc, unique, nullable")
     })
 })

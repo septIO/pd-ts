@@ -55,4 +55,21 @@ export class Utilities {
              */
             .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1')
     }
+
+    /**
+     * Tests a string for ambiguity
+     * if the regex has multiple matches that aren't the same it will return true
+     *
+     * @param str
+     * @param regex
+     */
+    public static isAmbiguous(str: string, regex: RegExp | string): boolean {
+        if (typeof regex === "string")
+            regex = new RegExp(regex, 'g')
+        let m = str.match(regex)!
+        if (!m)
+            return false
+
+        return !m.every(s => s === m[0])
+    }
 }
